@@ -4,7 +4,8 @@
 postgresql_version: 11 # LT: File vars.yml can be commented in file /home/sfedorov/tolq/ansible_scripts/playbook_postgresql.yml
 postgresql_version_terse: "{{ postgresql_version | replace('.', '') }}"  # Short version of the postgresql_version, used in some path and filenames
 postgresql_encoding: "UTF-8"
-postgresql_data_checksums: false # LT: checksum should be used in cluster creation in order to use pgrewind
+# LT: checksum should be used in cluster creation in order to use pgrewind
+postgresql_data_checksums: true
 postgresql_pwfile: ""
 
 postgresql_locale_parts:
@@ -30,7 +31,7 @@ postgresql_service_user_pgsql_profile: false
 postgresql_service_group: "{{ postgresql_admin_user }}"
 postgresql_service_enabled: true
 
-postgresql_cluster_name: "main" # LT: Should it be the same on all servers?
+postgresql_cluster_name: "test01" # LT: Should it be the same on all servers?
 postgresql_cluster_reset: false # LT: Should be 'true' if cluster_name is not 'main'
 
 postgresql_database_owner: "{{ postgresql_admin_user }}"
@@ -52,13 +53,23 @@ postgresql_fdw_mysql: no
 postgresql_fdw_ogr: no
 
 # List of databases to be created (optional)
-postgresql_databases: []
+# postgresql_databases: []
+postgresql_databases:
+  - name: repmgr_db
+    owner: repmgr_rl
 
 # List of database extensions to be created (optional)
 postgresql_database_extensions: []
 
 # List of users to be created (optional)
+# postgresql_users: []
 postgresql_users: []
+  - name: repmgr_rl
+    pass: repmgr_passwd
+    encrypted: yes
+  - name: pgbouncer
+    pass: pgbouncer_passwd
+    encrypted: yes
 
 # List of schemas to be created (optional)
 postgresql_database_schemas: []
