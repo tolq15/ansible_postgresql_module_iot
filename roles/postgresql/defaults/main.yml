@@ -31,14 +31,14 @@ postgresql_service_user_pgsql_profile: false
 postgresql_service_group: "{{ postgresql_admin_user }}"
 postgresql_service_enabled: true
 
-postgresql_cluster_name: "test01" # LT: Should it be the same on all servers?
-postgresql_cluster_reset: false # LT: Should be 'true' if cluster_name is not 'main'
+postgresql_cluster_name: "test02" # LT: Should it be the same on all servers?
+postgresql_cluster_reset: true   # LT: Should be 'true' if cluster_name is not 'main'
 
 postgresql_database_owner: "{{ postgresql_admin_user }}"
 
 # Extensions
-postgresql_ext_install_contrib: yes
-postgresql_ext_install_dev_headers: yes
+postgresql_ext_install_contrib: "true"
+postgresql_ext_install_dev_headers: "true"
 postgresql_ext_install_postgis: no
 
 postgresql_ext_postgis_version: "2.5" # be careful: check whether the postgresql/postgis versions work together
@@ -57,13 +57,23 @@ postgresql_fdw_ogr: no
 postgresql_databases:
   - name: repmgr_db
     owner: repmgr_rl
+  - name: example02
+    pgstattuple: yes
+    pg_stat_statements: yes
+    pg_buffercache: yes
 
 # List of database extensions to be created (optional)
-postgresql_database_extensions: []
+#postgresql_database_extensions: []
+postgresql_database_extensions:
+  - db: example02
+    extensions:
+      - pgstattuple
+      - pg_stat_statements
+      - pg_buffercache
 
 # List of users to be created (optional)
 # postgresql_users: []
-postgresql_users: []
+postgresql_users:
   - name: repmgr_rl
     pass: repmgr_passwd
     encrypted: yes
@@ -110,7 +120,8 @@ postgresql_hba_file: "{{ postgresql_conf_directory }}/pg_hba.conf"
 postgresql_ident_file: "{{ postgresql_conf_directory }}/pg_ident.conf"
 # Use data in another directory
 postgresql_varlib_directory_name: "postgresql"
-postgresql_data_directory: "/var/lib/{{ postgresql_varlib_directory_name }}/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
+# LT: postgresql_data_directory: "/var/lib/{{ postgresql_varlib_directory_name }}/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
+postgresql_data_directory: "/opt/{{ postgresql_varlib_directory_name }}/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
 postgresql_wal_directory: ""
 postgresql_pid_directory: "/var/run/postgresql"
 # If external_pid_file is not explicitly set, on extra PID file is written
@@ -209,7 +220,7 @@ postgresql_temp_file_limit: -1
 # - Kernel Resource Usage -
 
 postgresql_max_files_per_process: 1000  # min 25
-postgresql_shared_preload_libraries: []
+postgresql_shared_preload_libraries: ["pg_stat_statements","pg_prewarm"]
 
 
 # - Cost-Based Vacuum Delay -

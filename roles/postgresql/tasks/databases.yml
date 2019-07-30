@@ -38,6 +38,36 @@
 # Add following extensions: pgstattupl, pg_stat_statements, plpythonu, pg_buffercache, pg_prewarm, pageinspect
 # ALTER SYSTEM SET shared_preload_libraries = 'pg_prewarm';
 #
+- name: PostgreSQL | Add pg_prewarm to the databases with the requirement
+  become: yes
+  become_user: "{{postgresql_service_user}}"
+  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS pg_prewarm;'"
+  with_items: "{{postgresql_databases}}"
+  register: pg_prewarm_ext_result
+  failed_when: pg_prewarm_ext_result.rc != 0 and ("already exists, skipping" not in pg_prewarm_ext_result.stderr)
+  changed_when: pg_prewarm_ext_result.rc == 0 and ("already exists, skipping" not in pg_prewarm_ext_result.stderr)
+  when: item.pg_prewarm is defined and item.pg_prewarm
+
+- name: PostgreSQL | Add pg_stat_statements to the databases with the requirement
+  become: yes
+  become_user: "{{postgresql_service_user}}"
+  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS pg_stat_statements;'"
+  with_items: "{{postgresql_databases}}"
+  register: pg_stat_statements_ext_result
+  failed_when: pg_stat_statements_ext_result.rc != 0 and ("already exists, skipping" not in pg_stat_statements_ext_result.stderr)
+  changed_when: pg_stat_statements_ext_result.rc == 0 and ("already exists, skipping" not in pg_stat_statements_ext_result.stderr)
+  when: item.pg_stat_statements is defined and item.pg_stat_statements
+
+- name: PostgreSQL | Add pgstattuple to the databases with the requirement
+  become: yes
+  become_user: "{{postgresql_service_user}}"
+  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{postgresql_admin_user}} -c 'CREATE EXTENSION IF NOT EXISTS pgstattuple;'"
+  with_items: "{{postgresql_databases}}"
+  register: pgstattuple_ext_result
+  failed_when: pgstattuple_ext_result.rc != 0 and ("already exists, skipping" not in pgstattuple_ext_result.stderr)
+  changed_when: pgstattuple_ext_result.rc == 0 and ("already exists, skipping" not in pgstattuple_ext_result.stderr)
+  when: item.pgstattuple is defined and item.pgstattuple
+
 - name: PostgreSQL | Add hstore to the databases with the requirement
   become: yes
   become_user: "{{postgresql_service_user}}"
