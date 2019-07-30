@@ -34,6 +34,10 @@
     - extensions
   register: result
 
+#
+# Add following extensions: pgstattupl, pg_stat_statements, plpythonu, pg_buffercache, pg_prewarm, pageinspect
+# ALTER SYSTEM SET shared_preload_libraries = 'pg_prewarm';
+#
 - name: PostgreSQL | Add hstore to the databases with the requirement
   become: yes
   become_user: "{{postgresql_service_user}}"
@@ -64,7 +68,7 @@
 - name: PostgreSQL | add cube to the database with the requirement
   become: yes
   become_user: "{{postgresql_service_user}}"
-  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{ postgresql_admin_user }} -c 'create extension if not exists cube;'"
+  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{ postgresql_admin_user }} -c 'CREATE EXTENSION if not exists cube;'"
   with_items: "{{postgresql_databases}}"
   when: item.cube is defined and item.cube
 
@@ -78,7 +82,7 @@
 - name: PostgreSQL | add earthdistance to the database with the requirement
   become: yes
   become_user: "{{postgresql_service_user}}"
-  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{ postgresql_admin_user }} -c 'create extension if not exists earthdistance;'"
+  shell: "{{ postgresql_bin_directory}}/psql {{item.name}} --username {{ postgresql_admin_user }} -c 'CREATE EXTENSION if not exists earthdistance;'"
   with_items: "{{postgresql_databases}}"
   when: item.earthdistance is defined and item.earthdistance
 
