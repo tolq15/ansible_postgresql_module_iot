@@ -32,7 +32,9 @@ postgresql_service_group: "{{ postgresql_admin_user }}"
 postgresql_service_enabled: true
 
 postgresql_cluster_name: "test02" # LT: Should it be the same on all servers?
-postgresql_cluster_reset: true   # LT: Should be 'true' if cluster_name is not 'main'
+#postgresql_cluster_reset: "false" # LT: Cluster 'test02' is running. There is no need to recreate it.
+#postgresql_cluster_reset: "true"  # LT: Should be 'true' if cluster_name is not 'main'
+postgresql_cluster_reset: "true"  # LT: Recreate the cluster with new port number.
 
 postgresql_database_owner: "{{ postgresql_admin_user }}"
 

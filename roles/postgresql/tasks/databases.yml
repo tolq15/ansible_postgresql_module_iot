@@ -10,7 +10,7 @@
     name: "{{item.name}}"
     owner: "{{ item.owner | default(postgresql_database_owner) }}"
     encoding: "{{ item.encoding | default(postgresql_encoding) }}"
-    lc_collate: "{{ item.lc_collate | default(postgresql_locale) }}"
+#    lc_collate: "{{ item.lc_collate | default(postgresql_locale) }}" # Changing LC_COLLATE is not supported. Current LC_COLLATE: C.UTF-8
     lc_ctype: "{{ item.lc_ctype | default(postgresql_ctype) }}"
     port: "{{postgresql_port}}"
     template: "template0"
