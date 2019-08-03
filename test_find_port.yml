@@ -11,7 +11,8 @@
       become_user: "postgres"
       register: awk_output
 
-    - set_fact:
+    - name: Assign value to port
+      set_fact:
         postgresql_port: "{{ awk_output.stdout_lines[0] }}"
 
     - debug: var=postgresql_port
