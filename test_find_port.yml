@@ -1,0 +1,26 @@
+---
+- hosts: all
+
+  vars:
+    postgresql_admin_user: postgres
+    path_pg_conf: /etc/postgresql/11/test02/postgresql.conf
+  tasks:
+    - name: Find port number
+      shell: awk '/^port/ {print $3}' /etc/postgresql/11/test02/postgresql.conf
+      become: yes
+      become_user: "postgres"
+      register: awk_output
+
+    - set_fact:
+        postgresql_port: "{{ awk_output.stdout_lines[0] }}"
+
+    - debug: var=postgresql_port
+
+    - name: Check that port number is OK with psql
+      shell: psql -p {{ postgresql_port }} -c "select count(*) from pg_database"
+      become: yes
+      become_user: "postgres"
+      register: psql_output
+      
+    - debug: var=psql_output
+
