@@ -80,7 +80,11 @@
           group: "{{ postgresql_service_group }}"
           mode: 0644
           regexp: "{{ postgresql_cluster_name }}:.*$"
-          line: "{{ postgresql_cluster_name }}:1:{{ postgresql_version }}:{{ postgresql_port }}:{{ postgresql_service_user }}:/var/lib/pgsql:/usr/pgsql-{{ postgresql_version }}/bin:{{ postgresql_data_directory }}:::"
+          line: >
+            "{{ postgresql_cluster_name }}:1:{{ postgresql_version }}:
+            {{ postgresql_port }}:{{ postgresql_service_user }}:
+            /var/lib/pgsql:/usr/pgsql-{{ postgresql_version }}/bin:
+            {{ postgresql_data_directory }}:::"
         when: postgresql_service_user_pgsql_profile
 
       - name: PostgreSQL | PGTune | yum
