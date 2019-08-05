@@ -1,0 +1,29 @@
+---
+- hosts: all
+
+  vars:
+    postgresql_admin_user:   postgres
+    postgresql_cluster_name: test03
+
+  tasks:
+    - name: PostgreSQL | Check the PG cluster exists | Debian
+      shell: set -o pipefail; pg_lsclusters | grep {{ postgresql_cluster_name }}
+      args:
+        executable: /bin/bash   # it is /bin/sh by default and has no pipefail option
+      become: yes
+      become_user: "{{ postgresql_admin_user }}"
+      ignore_errors: true       # grep return error when pattern is not found
+      register: grep_output
+
+    - name: Set postgresql_port = 0 if cluster does not exist
+      set_fact:
+        postgresql_port: 0
+      when: grep_output.rc == 1
+
+    - name: Set postgresql_port = 0 if cluster does not exist
+      set_fact:
+        postgresql_port: 5432
+      when: grep_output.rc == 0
+
+    - debug: var=postgresql_port
+

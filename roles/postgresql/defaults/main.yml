@@ -31,9 +31,9 @@ postgresql_service_user_pgsql_profile: false
 postgresql_service_group: "{{ postgresql_admin_user }}"
 postgresql_service_enabled: true
 
-postgresql_cluster_name: "test02" # LT: Should it be the same on all servers?
+postgresql_cluster_name: "test03" # LT: Should it be the same on all servers?
+#postgresql_cluster_reset: "true"  # LT: Should be 'true' if this is a new cluster_name.
 postgresql_cluster_reset: "false" # LT: Cluster 'test02' is running. There is no need to recreate it.
-#postgresql_cluster_reset: "true"  # LT: Should be 'true' if cluster_name is not 'main'
 #postgresql_cluster_reset: "true"  # LT: Recreate the cluster with new port number.
 
 postgresql_database_owner: "{{ postgresql_admin_user }}"
@@ -60,9 +60,7 @@ postgresql_databases:
   - name: repmgr_db
     owner: repmgr_rl
   - name: example02
-    pgstattuple: yes
-    pg_stat_statements: yes
-    pg_buffercache: yes
+    owner: postgres
 
 # List of database extensions to be created (optional)
 #postgresql_database_extensions: []
@@ -72,6 +70,9 @@ postgresql_database_extensions:
       - pgstattuple
       - pg_stat_statements
       - pg_buffercache
+  - db: repmgr_db
+    extensions:
+      - pg_stat_statements
 
 # List of users to be created (optional)
 # postgresql_users: []
