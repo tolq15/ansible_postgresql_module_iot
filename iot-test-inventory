@@ -1,2 +1,6 @@
 [all]
 ca-iot-db-test
+
+[all_ssh]
+ca-iot-db-test
+ca-iot-db-dev
