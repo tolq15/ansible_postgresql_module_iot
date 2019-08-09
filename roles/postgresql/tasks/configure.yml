@@ -110,9 +110,11 @@
   - name: PostgreSQL | Reset the cluster - recreate the old cluster with old port number  | Debian
     shell: >
       pg_createcluster --locale {{ postgresql_locale }}
-      -e {{ postgresql_encoding }} -d {{ postgresql_data_directory }}
+      -e {{ postgresql_encoding }}
+      -d {{ postgresql_data_directory }}
       -p {{ postgresql_port }}
-      {{ postgresql_version }} {{ postgresql_cluster_name }}
+      {{ postgresql_version }}
+      {{ postgresql_cluster_name }}
       --
       {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
       {% if postgresql_pwfile | length > 0 %}--pwfile={{ postgresql_pwfile }} {% endif %}
@@ -127,11 +129,13 @@
 #
 - name: Cluster does not exist. Create new cluster with automatically generated port number
   block:
-  - name: PostgreSQL | Reset the cluster - recreate the old cluster with old port number  | Debian
+  - name: PostgreSQL | Create new cluster with automatically generated port number  | Debian
     shell: >
       pg_createcluster --locale {{ postgresql_locale }}
-      -e {{ postgresql_encoding }} -d {{ postgresql_data_directory }}
-      {{ postgresql_version }} {{ postgresql_cluster_name }}
+      -e {{ postgresql_encoding }}
+      -d {{ postgresql_data_directory }}
+      {{ postgresql_version }}
+      {{ postgresql_cluster_name }}
       --
       {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
       {% if postgresql_pwfile | length > 0 %}--pwfile={{ postgresql_pwfile }} {% endif %}
@@ -147,7 +151,37 @@
       postgresql_port: "{{ awk_output.stdout_lines[0] }}"
   become: yes
   become_user: "{{ postgresql_service_user }}"
-  when: ansible_os_family == "Debian" and postgresql_cluster_reset and grep_output.rc == 1
+  when: ansible_os_family == "Debian" and postgresql_cluster_reset and postgresql_port == 0 and postgresql_port_force == 0
+
+#
+# No, cluster does not exist. Create new cluster with postgresql_port_force port number
+#
+- name: Cluster does not exist. Create new cluster with postgresql_port_force port number
+  block:
+  - name: PostgreSQL | Create new cluster with postgresql_port_force port number | Debian
+    shell: >
+      pg_createcluster --locale {{ postgresql_locale }}
+      -e {{ postgresql_encoding }}
+      -d {{ postgresql_data_directory }}
+      -p {{ postgresql_port_force }}
+      {{ postgresql_version }}
+      {{ postgresql_cluster_name }}
+      --
+      {% if postgresql_data_checksums and postgresql_version is version_compare('9.3', '>=') %}--data-checksums{% endif %}
+      {% if postgresql_pwfile | length > 0 %}--pwfile={{ postgresql_pwfile }} {% endif %}
+      {% if (postgresql_wal_directory | length > 0) and postgresql_version is version_compare('10', '<') %}--xlogdir={{ postgresql_wal_directory }} {% endif %}
+      {% if (postgresql_wal_directory | length > 0) and postgresql_version is version_compare('10', '>=') %}--waldir={{ postgresql_wal_directory }} {% endif %}
+
+  - name: Extract port number from newly created PG configuration file
+    shell: awk '/^port/ {print $3}' {{ postgresql_conf_directory }}/postgresql.conf
+    register: awk_output
+
+  - name: Assign value to postgresql_port variable to use it all next operations
+    set_fact:
+      postgresql_port: "{{ awk_output.stdout_lines[0] }}"
+  become: yes
+  become_user: "{{ postgresql_service_user }}"
+  when: ansible_os_family == "Debian" and postgresql_cluster_reset and postgresql_port == 0 and postgresql_port_force > 0
 
 # LT: Lint: "systemctl used in place of systemd module"
 #- name: just force systemd to reread configs (2.4 and above)

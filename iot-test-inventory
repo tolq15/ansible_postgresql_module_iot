@@ -1,6 +1,6 @@
 [all]
 ca-iot-db-test
 
-[all_ssh]
+[test_dev]
 ca-iot-db-test
-ca-iot-db-dev
+ca-iot-db-backup-dev

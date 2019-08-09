@@ -1,10 +1,7 @@
 ---
 
-- hosts: all
+- hosts: test_dev
   remote_user: sfedorov
   become: yes
-# Check .gitignore 
-#  vars_files:
-#    - ./vars.yml
   roles:
     - postgresql
