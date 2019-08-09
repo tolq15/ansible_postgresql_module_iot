@@ -1,0 +1,12 @@
+For 'postgresql' module
+=======================
+1. Add config settings for repmgr.
+2. Add 'shared' settings for extentions when needed.
+3. Add additional parameters for extensions (pg_stat_statements).
+4. Remove pgtune and monit. Looks like they are not in use any more.
+5. Looks like pgsql_profile and pgtab can be removed.
+   They are for yum installation only and not in use.
+   Also, postgresql_service_user_pgsql_profile is 'false' by default.
+6. Check if it possible to create links between /etc/postgres/.../... configuration files
+   and /var/lib/postgresql/.../.../ files.
+   

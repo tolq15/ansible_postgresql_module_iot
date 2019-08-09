@@ -1,11 +1,15 @@
 # file: postgresql/defaults/main.yml
 
 # Basic settings
-postgresql_version: 11 # LT: File vars.yml can be commented in file /home/sfedorov/tolq/ansible_scripts/playbook_postgresql.yml
+#############################
+postgresql_version: 11
+#############################
 postgresql_version_terse: "{{ postgresql_version | replace('.', '') }}"  # Short version of the postgresql_version, used in some path and filenames
 postgresql_encoding: "UTF-8"
+#############################
 # LT: checksum should be used in cluster creation in order to use pgrewind
 postgresql_data_checksums: true
+#############################
 postgresql_pwfile: ""
 
 postgresql_locale_parts:
@@ -18,30 +22,32 @@ postgresql_ctype_parts:
 postgresql_ctype: "{{ postgresql_ctype_parts | join('.') }}"
 
 postgresql_env:
-  LC_ALL: "{{ postgresql_locale }}"
+  LC_ALL:    "{{ postgresql_locale }}"
   LC_LCTYPE: "{{ postgresql_locale }}"
 
-postgresql_admin_user: "postgres"
-postgresql_default_auth_method: "peer"
+postgresql_admin_user:                "postgres"
+postgresql_default_auth_method:       "peer"
 postgresql_default_auth_method_hosts: "md5"
 
 # The user/group that will run postgresql process or service
-postgresql_service_user: "{{ postgresql_admin_user }}"
+postgresql_service_user:               "{{ postgresql_admin_user }}"
+postgresql_service_group:              "{{ postgresql_admin_user }}"
+postgresql_service_enabled:            true
 postgresql_service_user_pgsql_profile: false
-postgresql_service_group: "{{ postgresql_admin_user }}"
-postgresql_service_enabled: true
 
-postgresql_cluster_name: "test03" # LT: Should it be the same on all servers?
-#postgresql_cluster_reset: "true"  # LT: Should be 'true' if this is a new cluster_name.
-postgresql_cluster_reset: "false" # LT: Cluster 'test02' is running. There is no need to recreate it.
-#postgresql_cluster_reset: "true"  # LT: Recreate the cluster with new port number.
+#############################
+postgresql_cluster_name:   "test03" # LT: Should it be the same on all servers?
+#postgresql_cluster_reset: "true"   # LT: Should be 'true' if this is a new cluster_name.
+postgresql_cluster_reset:  "false"  # LT: Cluster 'test02' is running. There is no need to recreate it.
+#postgresql_cluster_reset: "true"   # LT: Recreate the cluster with new port number.
+#############################
 
 postgresql_database_owner: "{{ postgresql_admin_user }}"
 
 # Extensions
-postgresql_ext_install_contrib: "true"
+postgresql_ext_install_contrib:     "true"
 postgresql_ext_install_dev_headers: "true"
-postgresql_ext_install_postgis: no
+postgresql_ext_install_postgis:     no
 
 postgresql_ext_postgis_version: "2.5" # be careful: check whether the postgresql/postgis versions work together
 
@@ -54,6 +60,7 @@ postgresql_ext_postgis_deps:
 postgresql_fdw_mysql: no
 postgresql_fdw_ogr: no
 
+#############################
 # List of databases to be created (optional)
 # postgresql_databases: []
 postgresql_databases:
@@ -61,7 +68,9 @@ postgresql_databases:
     owner: repmgr_rl
   - name: example02
     owner: postgres
+#############################
 
+#############################
 # List of database extensions to be created (optional)
 #postgresql_database_extensions: []
 postgresql_database_extensions:
@@ -73,7 +82,9 @@ postgresql_database_extensions:
   - db: repmgr_db
     extensions:
       - pg_stat_statements
+#############################
 
+#############################
 # List of users to be created (optional)
 # postgresql_users: []
 postgresql_users:
@@ -83,6 +94,7 @@ postgresql_users:
   - name: pgbouncer
     pass: pgbouncer_passwd
     encrypted: yes
+#############################
 
 # List of schemas to be created (optional)
 postgresql_database_schemas: []
@@ -92,15 +104,19 @@ postgresql_user_privileges: []
 
 # pg_hba.conf
 postgresql_pg_hba_default:
-  - { type: local, database: all, user: all, address: "",             method: "{{ postgresql_default_auth_method }}", comment: '"local" is for Unix domain socket connections only' }
-  - { type: host,  database: all, user: all, address: "127.0.0.1/32", method: "{{ postgresql_default_auth_method_hosts }}", comment: "IPv4 local connections:" }
-  - { type: host,  database: all, user: all, address: "::1/128",      method: "{{ postgresql_default_auth_method_hosts }}", comment: "IPv6 local connections:" }
-  - { type: local, database: all, user: "{{ postgresql_admin_user }}", address: "", method: "peer map=root_as_{{ postgresql_admin_user }}", comment: "Local root Unix user, passwordless access" }
+  - { type: local, database: all, user: all, address: "",
+  method: "{{ postgresql_default_auth_method }}", comment: '"local" is for Unix domain socket connections only' }
+  - { type: host,  database: all, user: all, address: "127.0.0.1/32",
+  method: "{{ postgresql_default_auth_method_hosts }}", comment: "IPv4 local connections:" }
+  - { type: host,  database: all, user: all, address: "::1/128",
+  method: "{{ postgresql_default_auth_method_hosts }}", comment: "IPv6 local connections:" }
+  - { type: local, database: all, user: "{{ postgresql_admin_user }}", address: "",
+  method: "peer map=root_as_{{ postgresql_admin_user }}", comment: "Local root Unix user, passwordless access" }
 
-postgresql_pg_hba_md5_hosts: []
+postgresql_pg_hba_md5_hosts:    []
 postgresql_pg_hba_passwd_hosts: []
-postgresql_pg_hba_trust_hosts: []
-postgresql_pg_hba_custom: []
+postgresql_pg_hba_trust_hosts:  []
+postgresql_pg_hba_custom:       []
 
 # pg_ident.conf
 postgresql_pg_ident:
@@ -117,16 +133,23 @@ postgresql_pg_ident:
 
 # Location of postgres configuration files here
 postgresql_conf_directory: "/etc/postgresql/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
+
 # HBA (Host Based Authentication) file
 postgresql_hba_file: "{{ postgresql_conf_directory }}/pg_hba.conf"
+
 # Ident configuration file
 postgresql_ident_file: "{{ postgresql_conf_directory }}/pg_ident.conf"
+
+#############################
 # Use data in another directory
-postgresql_varlib_directory_name: "postgresql"
 # LT: postgresql_data_directory: "/var/lib/{{ postgresql_varlib_directory_name }}/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
+postgresql_varlib_directory_name: "postgresql"
 postgresql_data_directory: "/opt/{{ postgresql_varlib_directory_name }}/{{ postgresql_version }}/{{ postgresql_cluster_name }}"
+#############################
+
 postgresql_wal_directory: ""
 postgresql_pid_directory: "/var/run/postgresql"
+
 # If external_pid_file is not explicitly set, on extra PID file is written
 postgresql_external_pid_file: "{{ postgresql_pid_directory }}/{{ postgresql_version }}-{{ postgresql_cluster_name }}.pid"
 
@@ -136,7 +159,10 @@ postgresql_external_pid_file: "{{ postgresql_pid_directory }}/{{ postgresql_vers
 
 postgresql_listen_addresses:
   - "localhost"
+
+#############################
 postgresql_port: 5433
+#############################
 
 postgresql_max_connections: 100
 postgresql_superuser_reserved_connections: 3
@@ -163,7 +189,7 @@ postgresql_ssl_ciphers:
   - "@STRENGTH"
 postgresql_ssl_prefer_server_ciphers: on
 postgresql_ssl_ecdh_curve: "prime256v1"
-postgresql_ssl_dh_params_file: ""                                   # (>= 10)  
+postgresql_ssl_dh_params_file: ""                                   # (>= 10)
 postgresql_ssl_passphrase_command: ""                               # (>= 11)
 postgresql_ssl_passphrase_command_supports_reload: off              # (>= 11)
 postgresql_ssl_renegotiation_limit: 512MB                           # amount of data between renegotiations
@@ -193,7 +219,7 @@ postgresql_tcp_keepalives_count: 0
 # - Memory -
 
 postgresql_shared_buffers:       128MB # min 128kB
-postgresql_huge_pages:           "try"   # on, off, or try
+postgresql_huge_pages:           "try" # on, off, or try
 postgresql_temp_buffers:         8MB   # min 800kB
 
 # Caution: it is not advisable to set max_prepared_transactions nonzero unless
@@ -223,7 +249,13 @@ postgresql_temp_file_limit: -1
 # - Kernel Resource Usage -
 
 postgresql_max_files_per_process: 1000  # min 25
+#############################
 postgresql_shared_preload_libraries: ["pg_stat_statements","pg_prewarm"]
+#############################
+
+#############################
+# Extension configuration parameters
+#############################
 
 
 # - Cost-Based Vacuum Delay -
@@ -263,7 +295,10 @@ postgresql_backend_flush_after:              0   # (>= 9.6) 0 disables, default 
 
 # - Settings -
 
-postgresql_wal_level: "minimal"   # minimal, archive (<= 9.5), hot_standby (<= 9.5), replica (>= 9.6), or logical
+#############################
+postgresql_wal_level: "replica"   # minimal, archive (<= 9.5), hot_standby (<= 9.5),
+                                  # replica (>= 9.6), or logical
+#############################
 postgresql_fsync:     on          # flush data to disk for crash safety
                                           # (turning this off can cause
                                           # unrecoverable data corruption)
@@ -310,14 +345,18 @@ postgresql_checkpoint_warning:           30s   # 0 disables
 
 # - Archiving -
 
+#############################
 # allows archiving to be done
 postgresql_archive_mode: "off"
+#############################
 
+#############################
 # Command to use to archive a logfile segment.
 # Placeholders: %p = path of file to archive
 #               %f = file name only
 # e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
 postgresql_archive_command: ""
+#############################
 
 # force a logfile segment switch after this
 postgresql_archive_timeout: 0
@@ -335,10 +374,10 @@ postgresql_archive_timeout: 0
 postgresql_max_wal_senders: 0
 postgresql_wal_sender_delay: 1s     # walsender cycle time, 1-10000 milliseconds (<= 9.1)
 
-postgresql_wal_keep_segments:  0    # in logfile segments, 16MB each; 0 disables
-postgresql_replication_timeout: 60s # in milliseconds; 0 disables (<= 9.2)
-postgresql_wal_sender_timeout: 60s  # in milliseconds; 0 disables (>= 9.3)
-postgresql_max_replication_slots: 0 # max number of replication slots
+postgresql_wal_keep_segments:     0  # in logfile segments, 16MB each; 0 disables
+postgresql_replication_timeout:  60s # in milliseconds; 0 disables (<= 9.2)
+postgresql_wal_sender_timeout:   60s # in milliseconds; 0 disables (>= 9.3)
+postgresql_max_replication_slots: 0  # max number of replication slots
 
 postgresql_track_commit_timestamp: off # (>= 9.5)
 
@@ -348,9 +387,10 @@ postgresql_track_commit_timestamp: off # (>= 9.5)
 
 # standby servers that provide sync rep.
 # number of sync standbys (>= 9.6) and comma-separated list of application_name from standby(s)
-postgresql_synchronous_standby_num_sync: "" # >= 9.6 (NOTE: If you use the ANY/ALL syntax in v10, then note the new variable below)
+postgresql_synchronous_standby_num_sync: "" # >= 9.6 (NOTE: If you use the ANY/ALL syntax in v10,
+                                            # then note the new variable below)
 postgresql_synchronous_standby_choose_sync: "FIRST" # >= 10
-postgresql_synchronous_standby_names: [] # '*' means 'all'
+postgresql_synchronous_standby_names: []            # '*' means 'all'
 
 # number of xacts by which cleanup is delayed
 postgresql_vacuum_defer_cleanup_age: 0
@@ -358,18 +398,28 @@ postgresql_vacuum_defer_cleanup_age: 0
 
 # - Standby Servers -
 
+#############################
 # "on" allows queries during recovery
 postgresql_hot_standby: off
+#############################
+
 # max delay before canceling queries when reading WAL from archive
 postgresql_max_standby_archive_delay: 30s # -1 allows indefinite delay
+
 # max delay before canceling queries when reading streaming WAL;
 postgresql_max_standby_streaming_delay: 30s # -1 allows indefinite delay
+
 # send replies at least this often
 postgresql_wal_receiver_status_interval: 10s # 0 disables
+
+#############################
 # send info from standby to prevent query conflicts
 postgresql_hot_standby_feedback: off
+#############################
+
 #time that receiver waits for communication from master in milliseconds
 postgresql_wal_receiver_timeout: 60s
+
 # time to wait before retrying to retrieve WAL after a failed attempt
 postgresql_wal_retrieve_retry_interval: 5s # (>= 9.5)
 
@@ -378,7 +428,7 @@ postgresql_wal_retrieve_retry_interval: 5s # (>= 9.5)
 # These settings are ignored on a publisher.
 
 postgresql_max_logical_replication_workers: 4   # (>= 10) taken from max_worker_processes
-            # (change requires restart)
+                                                # (change requires restart)
 postgresql_max_sync_workers_per_subscription: 2 # (>= 10) taken from max_logical_replication_workers
 
 
@@ -419,10 +469,10 @@ postgresql_jit_above_cost:             100000  # perform JIT compilation if avai
 postgresql_jit_inline_above_cost:      500000  # inline small functions if query is
 postgresql_jit_optimize_above_cost:    500000  # use expensive JIT optimizations if
 
-postgresql_min_parallel_relation_size: 8MB     # (= 9.6) replaced by below two parameters in 10
+postgresql_min_parallel_relation_size:   8MB   # (= 9.6) replaced by below two parameters in 10
 postgresql_min_parallel_table_scan_size: 8MB   # (>= 10)
 postgresql_min_parallel_index_scan_size: 512kB # (>= 10)
-postgresql_effective_cache_size:       128MB
+postgresql_effective_cache_size:         128MB
 
 
 # - Genetic Query Optimizer -
@@ -457,24 +507,30 @@ postgresql_jit:                        off          # (>= 11)
 # depending on platform. Csvlog requires logging_collector to be on.
 postgresql_log_destination:            "stderr"
 
+#############################
 # Enable capturing of stderr and csvlog into log files.
 # Required to be on for csvlogs.
 postgresql_logging_collector:          off
+#############################
 
 # These are only used if logging_collector is on:
 
 # Directory where log files are written, can be absolute or relative to PGDATA
 postgresql_log_directory:              "pg_log"
+
 # Log file name pattern, can include strftime() escapes
 postgresql_log_filename:               "postgresql-%Y-%m-%d_%H%M%S.log"
 postgresql_log_file_mode:              "0600" # begin with 0 to use octal notation
+
 # If on, an existing log file with the same name as the new log file will be
 # truncated rather than appended to. But such truncation only occurs on
 # time-driven rotation, not on restarts or size-driven rotation. Default is
 # off, meaning append to existing files in all cases.
 postgresql_log_truncate_on_rotation:   off
+
 # Automatic rotation of logfiles will happen after that time.
 postgresql_log_rotation_age:           1d
+
 # Automatic rotation of logfiles will happen after that much log output.
 postgresql_log_rotation_size:          10MB
 
@@ -483,6 +539,7 @@ postgresql_syslog_facility:            "LOCAL0"
 postgresql_syslog_ident:               "postgres"
 postgresql_syslog_sequence_numbers:    on         # (>= 9.6)
 postgresql_syslog_split_messages:      on         # (>= 9.6)
+
 # This is only relevant when logging to eventlog (win32) (>= 9.2):
 postgresql_event_source:               "PostgreSQL"
 
@@ -531,9 +588,11 @@ postgresql_log_min_messages: "warning"
 # - panic (effectively off)
 postgresql_log_min_error_statement: "error"
 
+#############################
 # -1 is disabled, 0 logs all statements and their durations, > 0 logs only
 # statements running at least this number of milliseconds
 postgresql_log_min_duration_statement: -1
+#############################
 
 
 # - What to Log -
@@ -542,12 +601,14 @@ postgresql_debug_print_parse:     off
 postgresql_debug_print_rewritten: off
 postgresql_debug_print_plan:      off
 postgresql_debug_pretty_print:    on
-postgresql_log_checkpoints:       off
-postgresql_log_connections:       off
-postgresql_log_disconnections:    off
-postgresql_log_duration:          off
+#############################
+postgresql_log_checkpoints:       on # off
+postgresql_log_connections:       on #off
+postgresql_log_disconnections:    on # off
+postgresql_log_duration:          on # off
 postgresql_log_error_verbosity:   "default"  # terse, default, or verbose messages
-postgresql_log_hostname:          off
+postgresql_log_hostname:          on # off
+#############################
 
 # Special values:
 #   %a = application name
@@ -569,8 +630,11 @@ postgresql_log_hostname:          off
 #   %q = stop here in non-session
 #        processes
 #   %% = '%'
-postgresql_log_line_prefix: "%t "
+#############################
+postgresql_log_line_prefix: "%t " # "%m " ??
+#############################
 
+#############################
 # log lock waits >= deadlock_timeout
 postgresql_log_lock_waits: off
 postgresql_log_statement:  "none"  # none, ddl, mod, all
@@ -578,6 +642,7 @@ postgresql_log_replication_commands: off
 # log temporary files equal or larger
 postgresql_log_temp_files: -1
 postgresql_log_timezone:   "UTC"
+#############################
 
 
 
@@ -593,7 +658,9 @@ postgresql_track_io_timing:           off   # (>= 9.2)
 postgresql_track_functions:           "none" # none, pl, all
 postgresql_track_activity_query_size: 1024
 postgresql_update_process_title:      on
-postgresql_stats_temp_directory:      "pg_stat_tmp"
+#############################
+postgresql_stats_temp_directory:      "pg_stat_tmp"  # Set up RAM disk
+#############################
 
 
 # - Statistics Monitoring -
@@ -610,27 +677,38 @@ postgresql_log_statement_stats: off
 
 # Enable autovacuum subprocess? 'on' requires track_counts to also be on.
 postgresql_autovacuum: on
+
 # -1 disables, 0 logs all actions and their durations, > 0 logs only
 # actions running at least this number of milliseconds.
 postgresql_log_autovacuum_min_duration: -1
+
 # max number of autovacuum subprocesses
 postgresql_autovacuum_max_workers: 3
+
 # time between autovacuum runs
 postgresql_autovacuum_naptime: 1min
+
 # min number of row updates before vacuum
 postgresql_autovacuum_vacuum_threshold: 50
+
 # min number of row updates before analyze
 postgresql_autovacuum_analyze_threshold: 50
+
 # fraction of table size before vacuum
 postgresql_autovacuum_vacuum_scale_factor: 0.2
+
 # fraction of table size before analyze
 postgresql_autovacuum_analyze_scale_factor: 0.1
+
 # maximum XID age before forced vacuum
 postgresql_autovacuum_freeze_max_age: 200000000
+
 # maximum Multixact age before forced vacuum (>= 9.3)
 postgresql_autovacuum_multixact_freeze_max_age: 400000000
+
 # default vacuum cost delay for autovacuum, in milliseconds
 postgresql_autovacuum_vacuum_cost_delay: 20ms
+
 # default vacuum cost limit for autovacuum,
 postgresql_autovacuum_vacuum_cost_limit: -1
 
@@ -684,7 +762,7 @@ postgresql_timezone:           "UTC"
 # You can create your own file in `share/timezonesets/`.
 postgresql_timezone_abbreviations: "Default"
 
-postgresql_extra_float_digits: 0          # min -15, max 3
+postgresql_extra_float_digits: 0      # min -15, max 3
 postgresql_client_encoding:    false  # actually defaults to database encoding
                                       # 'sql_ascii', 'UTF8', ...
 
@@ -692,10 +770,13 @@ postgresql_client_encoding:    false  # actually defaults to database encoding
 
 # locale for system error message
 postgresql_lc_messages: "{{ postgresql_locale }}"
+
 # locale for monetary formatting
 postgresql_lc_monetary: "{{ postgresql_locale }}"
+
 # locale for number formatting
 postgresql_lc_numeric: "{{ postgresql_locale }}"
+
 # locale for time formatting
 postgresql_lc_time: "{{ postgresql_locale }}"
 
@@ -754,8 +835,10 @@ postgresql_transform_null_equals:       off
 
 # Terminate session on any error?
 postgresql_exit_on_error: off
+
 # Reinitialize after backend crash?
 postgresql_restart_after_crash: on
+
 # Retry or panic on failure to fsync data?
 postgresql_data_sync_retry: off
 
@@ -767,8 +850,10 @@ postgresql_data_sync_retry: off
 # include files ending in '.conf' from
 # directory 'conf.d'
 postgresql_include_dir:        "conf.d"
+
 # include file only if it exists
 postgresql_include_if_exists:  false
+
 # include file
 postgresql_include:            false
 
@@ -778,12 +863,16 @@ postgresql_include:            false
 #------------------------------------------------------------------------------
 # Should we run pgtune and accept the changes it proposes?
 postgresql_pgtune: no
+
 # Total system memory in bytes, will attempt to detect if set to "no"
 postgresql_pgtune_memory: no
+
 # Database type, valid options are DW, OLTP, Web, Mixed, Desktop
 postgresql_pgtune_type: "Mixed"
+
 # Maximum number of expected connections, if "no", default based on db type
 postgresql_pgtune_connections: no
+
 
 #------------------------------------------------------------------------------
 # INSTALL/REPO
@@ -793,24 +882,32 @@ postgresql_pgtune_connections: no
 postgresql_install_repository: true
 
 # APT settings
-postgresql_apt_key_id: "ACCC4CF8"
-postgresql_apt_key_url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+postgresql_apt_key_id:     "ACCC4CF8"
+postgresql_apt_key_url:    "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
 postgresql_apt_repository: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main {{ postgresql_version }}"
+
 # Pin-Priority of PGDG repository
 postgresql_apt_pin_priority: 500
 
 # YUM repository locations
-postgresql_yum_repository_url: "http://yum.postgresql.org"
+postgresql_yum_repository_url:  "http://yum.postgresql.org"
 postgresql_pgdg_repository_url: "https://download.postgresql.org/pub/repos/yum/"
 
 # YUM (RedHat, CentOS, etc.) baseurl/gpgkey
-postgresql_yum_repository_baseurl: "{{ postgresql_yum_repository_url }}/{{ postgresql_version }}/{{ ansible_os_family | lower }}/rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}"
+postgresql_yum_repository_baseurl: >-
+  {{ postgresql_yum_repository_url }}/{{ postgresql_version }}/{{ ansible_os_family | lower }}/rhel
+  -{{ ansible_distribution_major_version }}-{{ ansible_architecture }}
+
 postgresql_yum_repository_gpgkey: "{{ postgresql_pgdg_repository_url }}/RPM-GPG-KEY-PGDG-{{ postgresql_version_terse }}"
 
 # DNF (Fedora) baseurl/gpgkey
-postgresql_dnf_repository_baseurl: "{{ postgresql_yum_repository_url }}/{{ postgresql_version }}/fedora/fedora-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}"
+postgresql_dnf_repository_baseurl: >-
+  {{ postgresql_yum_repository_url }}/{{ postgresql_version }}/fedora/fedora
+  -{{ ansible_distribution_major_version }}-{{ ansible_architecture }}
+
 postgresql_dnf_repository_gpgkey: "{{ postgresql_yum_repository_gpgkey }}"
 
 postgresql_apt_py3_dependencies: ["python3-psycopg2", "locales"]
 postgresql_apt_py2_dependencies: ["python-psycopg2", "python-pycurl", "locales"]
-postgresql_apt_dependencies: "{{ postgresql_apt_py3_dependencies if 'python3' in ansible_python_interpreter|default('') else postgresql_apt_py2_dependencies }}"
+postgresql_apt_dependencies:
+  "{{ postgresql_apt_py3_dependencies if 'python3' in ansible_python_interpreter|default('') else postgresql_apt_py2_dependencies }}"
